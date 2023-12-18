@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
+    "@quicknode/sdk": "^1.1.5",
     "@safe-global/safe-apps-react-sdk": "^4.6.6",
     "@types/node": "20.2.5",
     "@types/react": "18.2.7",

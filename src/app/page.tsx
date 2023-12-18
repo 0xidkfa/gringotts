@@ -2,25 +2,17 @@
 
 import SubmitButton from '@/components/SubmitButton';
 import { bn, expandDecimals, postData, safeJsonParse } from '@/helpers/utils';
-import { ChangeEvent, Dispatch, MouseEvent, SetStateAction, useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk';
 import { useFlashMessage } from '@/helpers/UseFlashMessage';
 import { MetaTransaction } from 'ethers-multisend';
 import { BigNumber } from 'ethers';
-import {
-  getMimApproveTx,
-  getMimDegenboxDepositTx,
-  getMimRepayTx,
-  getMimTopupTx,
-  getMimTransferTx,
-  getMimWithdrawTx,
-} from '@/models/GnosisEncoder';
-import { MIM_TREASURY_ADDR } from '@/helpers/constants';
-import { handleChange, renderInputGroup } from '@/helpers/formUtils';
+import { getMimApproveTx, getMimTopupTx } from '@/models/GnosisEncoder';
 import _ from 'underscore';
 import { Card } from '@/components/Card';
 import { CauldronInfoCard } from '@/components/CauldronInfoCard';
 import { getDegenBoxMimBalance } from '@/models/DistributionCalculator';
+import QuickNode from '@quicknode/sdk';
 
 export default function Home() {
   return (
@@ -61,7 +53,7 @@ function TopUpManager(props: {}) {
   const { showFlashMessage } = useFlashMessage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cauldronAddress, setCauldronAddress] = useState('');
-  const [cauldronInfo, setCauldronInfo] = useState<CauldronInfo>({});
+  const [cauldronInfo, setCauldronInfo] = useState<CauldronInfo | undefined>(undefined);
   const [mimAmount, setMimAmount] = useState('0');
 
   const { sdk, safe } = useSafeAppsSDK();
@@ -88,9 +80,11 @@ function TopUpManager(props: {}) {
     };
 
     // Set a timeout to wait for 3 seconds
-    timeoutId = setTimeout(() => {
-      fetchData(); // Call the async function
-    }, 3000);
+    if (cauldronAddress !== '') {
+      timeoutId = setTimeout(() => {
+        fetchData(); // Call the async function
+      }, 3000);
+    }
 
     // Cleanup function to clear the timeout when the component unmounts or cauldronAddress changes
     return () => {
@@ -99,6 +93,10 @@ function TopUpManager(props: {}) {
   }, [cauldronAddress]);
 
   async function getSubmitHandler() {
+    if (cauldronInfo === undefined) {
+      return;
+    }
+
     let txs = Array<MetaTransaction>();
 
     // This should be contained in the refund response...

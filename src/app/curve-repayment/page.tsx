@@ -66,7 +66,13 @@ function CurveRepayer() {
       if (!!repaymentResponse) {
         txs.push(getMimWithdrawTx(repaymentResponse.totalWithdraw));
         txs.push(getMimTransferTx(repaymentResponse.totalDistribution));
-        txs.push(getMimApproveTx(repaymentResponse.totalRefund));
+        txs.push(
+          getMimApproveTx({
+            amount: repaymentResponse.totalRefund,
+            mimAddress: MIM_CONTRACT_ADDR,
+            degenboxAddress: DEGENBOX_ADDRESS,
+          })
+        );
         txs.push(
           getMimDegenboxDepositTx({
             from: MIM_TREASURY_ADDR,

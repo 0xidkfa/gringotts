@@ -16,9 +16,11 @@ export function CauldronInfoCard({
       {info?.cauldron && (
         <div className="dashboard-card rounded-lg p-6 shadow-lg bg-black w-[500px]">
           <dl className="grid grid-cols-2 gap-x-4 gap-y-8">
-            <div>
+            <div className="col-span-2">
               <dt className="text-sm font-medium text-gray-400">Cauldron</dt>
-              <dd className="text-white font-semibold">{formatAddress(info.cauldron)}</dd>
+              <dd className="text-white font-semibold">
+                {info.collateral} {info.cauldron}
+              </dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-400">Interest</dt>
@@ -69,9 +71,9 @@ export function CauldronInfoCard({
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-400">LTV</dt>
+              <dt className="text-sm font-medium text-gray-400">Collateral Ratio</dt>
               <dd className="text-red-500 font-semibold">
-                {bnToFloat(bn(info.totalBorrowed).mul(expandDecimals(3)).div(bn(info.totalCollateral[1])), 1).toFixed(
+                {bnToFloat(bn(info.totalCollateral[1]).mul(expandDecimals(3)).div(bn(info.totalBorrowed)), 1).toFixed(
                   2
                 ) + '%'}
               </dd>
