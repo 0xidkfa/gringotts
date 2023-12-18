@@ -129,26 +129,23 @@ export function classNames(...classes: any) {
 }
 
 export async function postData(path: string, params: { [any: string]: any }) {
-  try {
-    const requestOptions: RequestInit = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(params),
-    };
+  const requestOptions: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  };
 
-    let response = await fetch(path, requestOptions);
+  let response = await fetch(path, requestOptions);
 
-    if (!response.ok) {
-      throw new Error('Request failed');
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error:', error);
+  if (!response.ok) {
+    console.log('FAILED');
+    throw new Error(`Request failed with status ${response.status}`);
   }
+
+  const data = await response.json();
+  return data;
 }
 
 export function sumBns(bns: Array<BigNumber>) {

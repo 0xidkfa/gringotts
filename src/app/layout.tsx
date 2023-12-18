@@ -4,6 +4,8 @@ import SafeProvider from '@safe-global/safe-apps-react-sdk';
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { FlashMessageProvider } from '@/helpers/UseFlashMessage';
+import Navigation from '@/components/Navigation';
+import FlashMessage from '@/components/FlashMessage';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,34 +27,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }
           >
             <div className="min-h-full">
-              <div className="bg-gray-800 pb-32">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                  <div className="border-b border-gray-700">
-                    <div className="flex h-16 items-center justify-between px-4 sm:px-0">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 flex items-center">
-                          <img className="h-8 w-8 mr-5" src="/logo.svg" alt="Gringotts" />
-                          <span className="text-white font-bold text-2xl">Gringotts</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <header className="py-10">
-                  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Repayments</h1>
-                  </div>
-                </header>
-              </div>
-
-              <main className="-mt-32">
-                <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
-                  <div className="rounded-lg bg-white px-5 py-6 shadow sm:px-6">{children}</div>
-                </div>
-              </main>
+              <Navigation></Navigation>
+              {children}
             </div>
           </SafeProvider>
+          <FlashMessage />
         </FlashMessageProvider>
       </body>
     </html>

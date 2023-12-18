@@ -13,6 +13,7 @@ export const CRV_CAULDRONS = [
 ];
 
 export const CRV_LENS_ADDR = '0xC93E1daFf233Df6cc7F811C9dca7721709804016';
+export const MARKET_LENS_ADDR = '0x1d17009dde57caea3dc614962a6c01420776523f';
 export const MAX_REFUND_RATE = bn(700); // 18% - 11%
 export const BPS = bn(10000);
 export const WEEKS_IN_YEAR = 52;

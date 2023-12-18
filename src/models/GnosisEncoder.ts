@@ -12,37 +12,87 @@ import {
 } from '../helpers/constants';
 import { bn } from '@/helpers/utils';
 
-export function getMimApproveTx(amount: BigNumber): MetaTransaction {
+export function getMimApproveTx({
+  amount,
+  mimAddress,
+  degenboxAddress,
+}: {
+  amount: BigNumber;
+  mimAddress: string;
+  degenboxAddress: string;
+}): MetaTransaction {
   let contractInterface = new ethers.utils.Interface(erc20ABI);
 
   return encodeSingle({
     id: '',
     type: TransactionType.callContract,
-    to: MIM_CONTRACT_ADDR,
+    to: mimAddress,
     abi: JSON.stringify(erc20ABI),
     functionSignature: contractInterface.getFunction('approve').format(),
     inputValues: {
-      spender: DEGENBOX_ADDRESS,
+      spender: degenboxAddress,
       amount: bn(amount).toString(),
     },
     value: '0',
   });
 }
 
-export function getMimDegenboxDepositTx(from: string, amount: BigNumber): MetaTransaction {
+export function getMimDegenboxDepositTx({
+  from,
+  amount,
+  degenboxAddress,
+  mimAddress,
+}: {
+  from: string;
+  amount: BigNumber;
+  degenboxAddress: string;
+  mimAddress: string;
+}): MetaTransaction {
   let contractInterface = new ethers.utils.Interface(bentoBoxAbi);
 
   return encodeSingle({
     id: '',
     type: TransactionType.callContract,
-    to: DEGENBOX_ADDRESS,
+    to: degenboxAddress,
     abi: JSON.stringify(bentoBoxAbi),
     functionSignature: contractInterface.getFunction('deposit').format(),
     inputValues: {
-      token_: MIM_CONTRACT_ADDR,
+      token_: mimAddress,
       from: from,
-      to: DEGENBOX_ADDRESS,
+      to: degenboxAddress,
       amount: bn(amount).toString(),
+      share: '0',
+    },
+    value: '0',
+  });
+}
+
+export function getMimTopupTx({
+  cauldronAddress,
+  safeAddress,
+  amount,
+  degenboxAddress,
+  mimAddress,
+}: {
+  cauldronAddress: string;
+  safeAddress: string;
+  amount: BigNumber;
+  degenboxAddress: string;
+  mimAddress: string;
+}): MetaTransaction {
+  let contractInterface = new ethers.utils.Interface(bentoBoxAbi);
+
+  return encodeSingle({
+    id: '',
+    type: TransactionType.callContract,
+    to: degenboxAddress,
+    abi: JSON.stringify(bentoBoxAbi),
+    functionSignature: contractInterface.getFunction('deposit').format(),
+    inputValues: {
+      token_: mimAddress,
+      from: safeAddress,
+      to: cauldronAddress,
+      amount: amount.toString(),
       share: '0',
     },
     value: '0',
