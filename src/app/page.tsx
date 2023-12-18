@@ -16,19 +16,8 @@ import QuickNode from '@quicknode/sdk';
 
 export default function Home() {
   return (
-    <div>
-      <div className="bg-gray-800 pb-32">
-        <header className="py-10">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-white">Cauldron Top-ups</h1>
-          </div>
-        </header>
-      </div>
-      <div className="-mt-32 container mx-auto bg-white min-h-64 rounded-3xl p-8">
-        <div className="">
-          <TopUpManager></TopUpManager>
-        </div>
-      </div>
+    <div className=" container mx-auto px-8 py-4">
+      <TopUpManager></TopUpManager>
     </div>
   );
 }
@@ -83,7 +72,7 @@ function TopUpManager(props: {}) {
     if (cauldronAddress !== '') {
       timeoutId = setTimeout(() => {
         fetchData(); // Call the async function
-      }, 3000);
+      }, 1000);
     }
 
     // Cleanup function to clear the timeout when the component unmounts or cauldronAddress changes
@@ -128,30 +117,34 @@ function TopUpManager(props: {}) {
 
   return (
     <div>
-      <h2 className="text-base font-semibold leading-7 text-gray-900">Cauldron Top-up</h2>
-      <div className="mb-5">
-        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-          <div className="sm:col-span-2">
-            <label htmlFor="cauldron" className="block text-sm font-medium leading-6 text-gray-900">
-              Cauldron
-            </label>
-            <div className="mt-2">
+      <div className="mt-5 flex flex-row gap-24">
+        <div className="flex flex-col w-1/3 gap-6">
+          <div>
+            <div className="mt-2 relative">
+              <label htmlFor="cauldron" className="block text-xs font-medium text-zinc-600">
+                Cauldron Address
+              </label>
               <input
                 type="text"
                 name="cauldron"
                 id="cauldron"
-                className="block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="peer block w-full bg-transparent py-1.5 text-gray-200 pl-3 focus:outline-none sm:text-sm sm:leading-6"
+                placeholder="0x..."
                 onChange={(event) => setCauldronAddress(event.target.value)}
                 value={cauldronAddress}
+              />
+              <div
+                className="absolute inset-x-0 bottom-0 border-t border-gray-400 peer-focus:border-t-1 peer-focus:border-blue-500"
+                aria-hidden="true"
               />
             </div>
           </div>
 
-          <div className="sm:col-span-2">
-            <label htmlFor="amount" className="block text-sm font-medium leading-6 text-gray-900">
-              Amount
+          <div>
+            <label htmlFor="amount" className="block text-xs font-medium text-zinc-600">
+              Top-up Amount
             </label>
-            <div className="relative mt-2 rounded-md shadow-sm">
+            <div className="relative rounded-md shadow-sm">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <span className="text-gray-500 sm:text-sm">$</span>
               </div>
@@ -159,7 +152,7 @@ function TopUpManager(props: {}) {
                 type="text"
                 name="price"
                 id="price"
-                className="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="peer block w-full bg-transparent py-1.5 text-gray-200 pr-14 text-right focus:outline-none sm:text-sm sm:leading-6"
                 placeholder="0.00"
                 onChange={(e) => setMimAmount(e.target.value)}
                 value={mimAmount}
@@ -170,24 +163,26 @@ function TopUpManager(props: {}) {
                   MIM
                 </span>
               </div>
+              <div
+                className="absolute inset-x-0 bottom-0 border-t border-gray-400 peer-focus:border-t-1 peer-focus:border-blue-500"
+                aria-hidden="true"
+              />
             </div>
           </div>
 
-          <div className="sm:col-span-2">
-            <label htmlFor="amount" className="block text-sm font-medium leading-6 text-gray-900">
-              &nbsp;
-            </label>
+          <div>
             <button
-              className="rounded bg-indigo-600 px-4 py-1 text-md font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               onClick={getSubmitHandler}
             >
               Submit
             </button>
           </div>
         </div>
+        <div className="w-2/3 flex flex-col">
+          <CauldronInfoCard info={cauldronInfo} mimAmount={mimAmount} isSubmitting={isSubmitting}></CauldronInfoCard>
+        </div>
       </div>
-
-      <CauldronInfoCard info={cauldronInfo} mimAmount={mimAmount} isSubmitting={isSubmitting}></CauldronInfoCard>
     </div>
   );
 }

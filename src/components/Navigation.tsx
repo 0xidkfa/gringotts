@@ -3,8 +3,8 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const navigation = [
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
+  { name: 'Cauldron Top-up', href: '#', current: true },
+  { name: 'Github', href: 'https://github.com/0xidkfa/gringotts', current: false },
 ];
 
 //@ts-ignore
@@ -14,14 +14,14 @@ function classNames(...classes) {
 
 export default function Navigation() {
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure as="nav">
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 p-4">
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
-                <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                   <span className="absolute -inset-0.5" />
                   <span className="sr-only">Open main menu</span>
                   {open ? (
@@ -31,22 +31,25 @@ export default function Navigation() {
                   )}
                 </Disclosure.Button>
               </div>
-              <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+              <div className="flex flex-1">
                 <div className="flex flex-shrink-0 items-center">
                   <img className="h-8 w-8 mr-5" src="/logo.svg" alt="Gringotts" />
-                  <span className="text-white font-bold text-2xl">Gringotts</span>
+                  <span className="text-zinc-100 font-bold text-2xl">Gringotts</span>
                 </div>
-                <div className="hidden sm:ml-24 sm:block">
+              </div>
+              <div className="flex flex-1">
+                <div className="hidden sm:block bg-zinc-800 rounded-2xl px-4">
                   <div className="flex space-x-4">
                     {navigation.map((item) => (
                       <a
                         key={item.name}
                         href={item.href}
                         className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          item.current ? 'text-blue-500' : 'text-gray-300 hover:text-zinc-100',
                           'rounded-md px-3 py-2 text-sm font-medium'
                         )}
                         aria-current={item.current ? 'page' : undefined}
+                        target={item.href.startsWith('http') ? '_blank' : ''}
                       >
                         {item.name}
                       </a>
@@ -54,6 +57,7 @@ export default function Navigation() {
                   </div>
                 </div>
               </div>
+              <div className="flex flex-1 justify-end">&nbsp;</div>
             </div>
           </div>
 
@@ -65,7 +69,7 @@ export default function Navigation() {
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    item.current ? 'bg-gray-900 text-zinc-100' : 'text-gray-300 hover:bg-gray-700 hover:text-zinc-100',
                     'block rounded-md px-3 py-2 text-base font-medium'
                   )}
                   aria-current={item.current ? 'page' : undefined}
