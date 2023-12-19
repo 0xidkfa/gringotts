@@ -13,9 +13,14 @@ export function CauldronInfoCard({
   return (
     <>
       {isSubmitting && (
-        <span className="text-blue-500">
-          <Spinner></Spinner>
-        </span>
+        <div className="dashboard-card rounded-lg p-6 shadow-lg dark:bg-zinc-900 border dark:border-zinc-700/40 w-[500px]">
+          <div className="flex flex-col items-center">
+            <div className="text-blue-600 w-12 h-12">
+              <Spinner></Spinner>
+            </div>
+            <span className="text-zinc-100">Loading cauldron info...</span>
+          </div>
+        </div>
       )}
       {info?.cauldron && !isSubmitting && (
         <div className="dashboard-card rounded-lg p-6 shadow-lg dark:bg-zinc-900 border dark:border-zinc-700/40 w-[500px]">

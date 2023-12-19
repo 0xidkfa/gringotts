@@ -1,10 +1,11 @@
 import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { GITHUB_ICON } from '@/helpers/constants';
 
 const navigation = [
   { name: 'Cauldron Top-up', href: '#', current: true },
-  { name: 'Github', href: 'https://github.com/0xidkfa/gringotts', current: false },
+  { name: 'Github', href: 'https://github.com/0xidkfa/gringotts', current: false, icon: GITHUB_ICON },
 ];
 
 //@ts-ignore
@@ -51,7 +52,15 @@ export default function Navigation() {
                         aria-current={item.current ? 'page' : undefined}
                         target={item.href.startsWith('http') ? '_blank' : ''}
                       >
-                        {item.name}
+                        <span className="flex flex-row items-center">
+                          {item.icon && (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                              <path d={item.icon} fill="currentColor" />
+                            </svg>
+                          )}
+
+                          {item.name}
+                        </span>
                       </a>
                     ))}
                   </div>
@@ -74,7 +83,15 @@ export default function Navigation() {
                   )}
                   aria-current={item.current ? 'page' : undefined}
                 >
-                  {item.name}
+                  <span className="flex flex-row items-center">
+                    {item.icon && (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path d={item.icon} />
+                      </svg>
+                    )}
+
+                    {item.name}
+                  </span>
                 </Disclosure.Button>
               ))}
             </div>
