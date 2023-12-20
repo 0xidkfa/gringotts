@@ -14,7 +14,12 @@ export async function POST(request: NextRequest) {
   let lensContract = new Contract(MARKET_LENS_ADDR, marketLensAbi, provider);
   let cauldronContract = new Contract(cauldronAddress, cauldronAbi, provider);
 
-  let info = await lensContract.getMarketInfoCauldronV3(cauldronAddress);
+  let info;
+  try {
+    info = await lensContract.getMarketInfoCauldronV3(cauldronAddress);
+  } catch (e) {
+    info = await lensContract.getMarketInfoCauldronV2(cauldronAddress);
+  }
   let degenboxAddress = await cauldronContract.bentoBox();
   let collateralAddress = await cauldronContract.collateral();
   let mimAddress = await cauldronContract.magicInternetMoney();

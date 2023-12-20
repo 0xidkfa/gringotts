@@ -10,6 +10,14 @@ export function CauldronInfoCard({
   mimAmount: string;
   isSubmitting: boolean;
 }) {
+  function lowMimBalance() {
+    let marketMaxBorrow = bn(info.marketMaxBorrow).div(expandDecimals(18)).toNumber();
+    let totalBorrowed = bn(info.totalBorrowed).div(expandDecimals(18)).toNumber();
+    let ratio = marketMaxBorrow / (totalBorrowed + marketMaxBorrow);
+
+    return ratio < 0.1;
+  }
+
   return (
     <>
       {isSubmitting && (
@@ -34,13 +42,11 @@ export function CauldronInfoCard({
             <div className="flex flex-row w-full">
               <div className="flex w-1/2 flex-col">
                 <div className="text-sm font-medium text-gray-600">Interest</div>
-                <div className="text-emerald-400 font-semibold">
-                  {bnToFloat(info.interestPerYear, 2).toFixed(2) + '%'}
-                </div>
+                <div className="text-zinc-100 font-semibold">{bnToFloat(info.interestPerYear, 2).toFixed(2) + '%'}</div>
               </div>
               <div className="flex w-1/2 flex-col">
                 <div className="text-sm font-medium text-gray-600">Collateralization</div>
-                <div className="text-emerald-400 font-semibold">
+                <div className="text-zinc-100 font-semibold">
                   {bnToFloat(info.maximumCollateralRatio, 2).toFixed(2) + '%'}
                 </div>
               </div>
@@ -48,19 +54,22 @@ export function CauldronInfoCard({
             <div className="flex flex-row w-full">
               <div className="flex w-1/2 flex-col">
                 <div className="text-sm font-medium text-gray-600">Opening fee</div>
-                <div className="text-emerald-400 font-semibold">{bnToFloat(info.borrowFee, 2).toFixed(2) + '%'}</div>
+                <div className="text-zinc-100 font-semibold">{bnToFloat(info.borrowFee, 2).toFixed(2) + '%'}</div>
               </div>
               <div className="flex w-1/2 flex-col">
                 <div className="text-sm font-medium text-gray-600">Liquidation fee</div>
-                <div className="text-emerald-400 font-semibold">
-                  {bnToFloat(info.liquidationFee, 2).toFixed(2) + '%'}
-                </div>
+                <div className="text-zinc-100 font-semibold">{bnToFloat(info.liquidationFee, 2).toFixed(2) + '%'}</div>
               </div>
             </div>
             <div className="flex flex-row w-full">
               <div className="flex w-1/2 flex-col">
                 <div className="text-sm font-medium text-gray-600">Available to be borrowed</div>
-                <div className="text-black dark:text-zinc-100 font-semibold">
+
+                <div
+                  className={`text-black ${
+                    lowMimBalance() ? 'dark:text-red-400' : 'dark:text-emerald-400'
+                  } font-semibold`}
+                >
                   {formatNumber(bn(info.marketMaxBorrow).div(expandDecimals(18)).toNumber()).toString() + ' MIM'}
                 </div>
               </div>
@@ -80,7 +89,7 @@ export function CauldronInfoCard({
               </div>
               <div className="flex w-1/2 flex-col">
                 <div className="text-sm font-medium text-gray-600">Collateral Value</div>
-                <div className="text-emerald-400 font-semibold">
+                <div className="text-zinc-100 font-semibold">
                   {formatNumber(bn(info.totalCollateral[1]).div(expandDecimals(18)).toNumber()).toString() + ' MIM'}
                 </div>
               </div>
@@ -94,7 +103,7 @@ export function CauldronInfoCard({
               </div>
               <div className="flex w-1/2 flex-col">
                 <div className="text-sm font-medium text-gray-600">Collateral Ratio</div>
-                <div className="text-red-400 font-semibold">
+                <div className="text-zinc-100 font-semibold">
                   {bnToFloat(bn(info.totalCollateral[1]).mul(expandDecimals(3)).div(bn(info.totalBorrowed)), 1).toFixed(
                     2
                   ) + '%'}
@@ -104,7 +113,7 @@ export function CauldronInfoCard({
           </div>
           <div className="flex justify-between items-center mt-8 pt-4 border-t border-gray-600">
             <span className="text-gray-600">Top Up Amount</span>
-            <span className="text-black dark:text-zinc-100 font-semibold">
+            <span className="text-black dark:text-emerald-400 font-semibold">
               {formatNumber(parseFloat(mimAmount), 2)} MIM
             </span>
           </div>
