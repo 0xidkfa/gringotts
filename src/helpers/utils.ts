@@ -1,35 +1,44 @@
-import { findKey } from 'underscore';
-import { BigNumber, ethers, providers } from 'ethers';
-import moment from 'moment';
+import { findKey } from "underscore";
+import { BigNumber, ethers, providers } from "ethers";
+import moment from "moment";
 
 export function safeJsonParse(value: string | null): string {
   try {
-    if (value == null) return '';
-    else return JSON.parse(value) || '';
+    if (value == null) return "";
+    else return JSON.parse(value) || "";
   } catch (e) {
     console.log(`Error parsing JSON: ${value}`);
-    return '';
+    return "";
   }
 }
 
 export function formatAddress(address: string) {
-  return address.substring(0, 5) + '...' + address.substring(address.length - 5, address.length);
+  return (
+    address.substring(0, 5) +
+    "..." +
+    address.substring(address.length - 5, address.length)
+  );
 }
 
 export function formatNumber(number: number, decimalPlaces = 2): string {
-  const decimalSeparator = '.';
-  const thousandsSeparator = ',';
+  const decimalSeparator = ".";
+  const thousandsSeparator = ",";
 
   // Convert the BigNumber to a string with the desired decimal places
 
   // Split the formatted number into integer and decimal parts
-  const [integerPart, decimalPart] = number.toFixed(decimalPlaces).split('.');
+  const [integerPart, decimalPart] = number.toFixed(decimalPlaces).split(".");
 
   // Add thousands separators to the integer part
-  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator);
+  const formattedInteger = integerPart.replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    thousandsSeparator,
+  );
 
   // Combine the formatted integer part and decimal part (if exists)
-  let result = decimalPart ? `${formattedInteger}${decimalSeparator}${decimalPart}` : formattedInteger;
+  let result = decimalPart
+    ? `${formattedInteger}${decimalSeparator}${decimalPart}`
+    : formattedInteger;
 
   return result;
 }
@@ -53,7 +62,7 @@ export function getProvider(forkUrl: string): ethers.providers.JsonRpcProvider {
 export function getContract(
   address: string,
   abi: ethers.ContractInterface,
-  provider: ethers.providers.JsonRpcProvider
+  provider: ethers.providers.JsonRpcProvider,
 ) {
   return new ethers.Contract(address, abi, provider);
 }
@@ -72,7 +81,7 @@ export function findPreviousThursday() {
   let date = moment.utc();
 
   while (date.day() != 4) {
-    date = date.subtract(1, 'day');
+    date = date.subtract(1, "day");
   }
 
   return date;
@@ -80,8 +89,10 @@ export function findPreviousThursday() {
 
 export async function findClosestBlock(time: number) {
   // Set up provider to connect to an Ethereum node
-  console.log('KEY', process.env.ALCHEMY_KEY);
-  const provider = new providers.AlchemyProvider('mainnet', process.env.ALCHEMY_KEY);
+  const provider = new providers.AlchemyProvider(
+    "mainnet",
+    process.env.ALCHEMY_KEY,
+  );
   // const provider = new providers.JsonRpcProvider('https://eth.llamarpc.com');
 
   // Get the current block number
@@ -125,14 +136,14 @@ export async function findClosestBlock(time: number) {
 }
 
 export function classNames(...classes: any) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export async function postData(path: string, params: { [any: string]: any }) {
   const requestOptions: RequestInit = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(params),
   };
@@ -140,7 +151,7 @@ export async function postData(path: string, params: { [any: string]: any }) {
   let response = await fetch(path, requestOptions);
 
   if (!response.ok) {
-    console.log('FAILED');
+    console.log("FAILED");
     throw new Error(`Request failed with status ${response.status}`);
   }
 

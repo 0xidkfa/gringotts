@@ -1,16 +1,27 @@
-import { Fragment } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { GITHUB_ICON } from '@/helpers/constants';
+import { Fragment } from "react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { GITHUB_ICON } from "@/helpers/constants";
+import { Roboto_Slab } from "next/font/google";
+
+const bungee = Roboto_Slab({
+  weight: "800",
+  subsets: ["latin"],
+});
 
 const navigation = [
-  { name: 'Cauldron Top-up', href: '#', current: true },
-  { name: 'Github', href: 'https://github.com/0xidkfa/gringotts', current: false, icon: GITHUB_ICON },
+  { name: "Cauldron Top-up", href: "#", current: true },
+  {
+    name: "Github",
+    href: "https://github.com/0xidkfa/gringotts",
+    current: false,
+    icon: GITHUB_ICON,
+  },
 ];
 
 //@ts-ignore
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Navigation() {
@@ -18,7 +29,7 @@ export default function Navigation() {
     <Disclosure as="nav">
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 p-4">
+          <div className="container mx-auto p-4 sm:px-6 lg:px-8">
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
@@ -34,27 +45,41 @@ export default function Navigation() {
               </div>
               <div className="flex flex-1">
                 <div className="flex flex-shrink-0 items-center">
-                  <img className="h-8 w-8 mr-5" src="/logo.svg" alt="Gringotts" />
-                  <span className="text-zinc-100 font-bold text-2xl">Gringotts</span>
+                  <img
+                    className="mr-3 h-8 w-8"
+                    src="/logo.svg"
+                    alt="Gringotts"
+                  />
+                  <span
+                    className={`text-3xl font-bold uppercase text-zinc-100 ${bungee.className}`}
+                  >
+                    Gringotts
+                  </span>
                 </div>
               </div>
               <div className="flex flex-1">
-                <div className="hidden sm:block bg-zinc-800 rounded-2xl px-4">
+                <div className="hidden rounded-2xl bg-zinc-800 px-4 sm:block">
                   <div className="flex space-x-4">
                     {navigation.map((item) => (
                       <a
                         key={item.name}
                         href={item.href}
                         className={classNames(
-                          item.current ? 'text-blue-500' : 'text-gray-300 hover:text-zinc-100',
-                          'rounded-md px-3 py-2 text-sm font-medium'
+                          item.current
+                            ? "text-blue-500"
+                            : "text-gray-300 hover:text-zinc-100",
+                          "rounded-md px-3 py-2 text-sm font-medium",
                         )}
-                        aria-current={item.current ? 'page' : undefined}
-                        target={item.href.startsWith('http') ? '_blank' : ''}
+                        aria-current={item.current ? "page" : undefined}
+                        target={item.href.startsWith("http") ? "_blank" : ""}
                       >
                         <span className="flex flex-row items-center">
                           {item.icon && (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 w-5 h-5" viewBox="0 0 24 24">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="mr-2 h-5 w-5"
+                              viewBox="0 0 24 24"
+                            >
                               <path d={item.icon} fill="currentColor" />
                             </svg>
                           )}
@@ -78,14 +103,21 @@ export default function Navigation() {
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current ? 'bg-gray-900 text-zinc-100' : 'text-gray-300 hover:bg-gray-700 hover:text-zinc-100',
-                    'block rounded-md px-3 py-2 text-base font-medium'
+                    item.current
+                      ? "bg-gray-900 text-zinc-100"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-zinc-100",
+                    "block rounded-md px-3 py-2 text-base font-medium",
                   )}
-                  aria-current={item.current ? 'page' : undefined}
+                  aria-current={item.current ? "page" : undefined}
                 >
                   <span className="flex flex-row items-center">
                     {item.icon && (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                      >
                         <path d={item.icon} />
                       </svg>
                     )}

@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import SubmitButton from '@/components/SubmitButton';
-import { bn, expandDecimals, postData, safeJsonParse } from '@/helpers/utils';
-import { useEffect, useState } from 'react';
-import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk';
-import { useFlashMessage } from '@/helpers/UseFlashMessage';
-import { MetaTransaction } from 'ethers-multisend';
-import { BigNumber } from 'ethers';
-import { getMimApproveTx, getMimTopupTx } from '@/models/GnosisEncoder';
-import _ from 'underscore';
-import { Card } from '@/components/Card';
-import { CauldronInfoCard } from '@/components/CauldronInfoCard';
-import { getDegenBoxMimBalance } from '@/models/DistributionCalculator';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import SubmitButton from "@/components/SubmitButton";
+import { bn, expandDecimals, postData, safeJsonParse } from "@/helpers/utils";
+import { useEffect, useState } from "react";
+import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
+import { useFlashMessage } from "@/helpers/UseFlashMessage";
+import { MetaTransaction } from "ethers-multisend";
+import { BigNumber } from "ethers";
+import { getMimApproveTx, getMimTopupTx } from "@/models/GnosisEncoder";
+import _ from "underscore";
+import { Card } from "@/components/Card";
+import { CauldronInfoCard } from "@/components/CauldronInfoCard";
+import { getDegenBoxMimBalance } from "@/models/DistributionCalculator";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 export default function Home() {
   return (
@@ -46,9 +46,11 @@ interface TxInfo {
 
 function TopUpManager(props: {}) {
   const { showFlashMessage } = useFlashMessage();
-  const [inputCauldronAddr, setInputCauldronAddr] = useState('');
-  const [inputMimAmount, setInputMimAmount] = useState('0');
-  const [cauldronCards, setCauldronCards] = useState<{ [key: string]: TxInfo }>({});
+  const [inputCauldronAddr, setInputCauldronAddr] = useState("");
+  const [inputMimAmount, setInputMimAmount] = useState("0");
+  const [cauldronCards, setCauldronCards] = useState<{ [key: string]: TxInfo }>(
+    {},
+  );
   const { sdk, safe } = useSafeAppsSDK();
 
   async function fetchCauldronInfo(cauldronAddress: string) {
@@ -65,14 +67,16 @@ function TopUpManager(props: {}) {
       }));
 
       let chain = await sdk.safe.getChainInfo();
-      response = await postData('/api/cauldronInfo', { cauldronAddress, chain });
-      console.log(response);
+      response = await postData("/api/cauldronInfo", {
+        cauldronAddress,
+        chain,
+      });
 
       return response;
     } catch (error) {
       showFlashMessage({
-        type: 'error',
-        heading: 'Porcodillo!',
+        type: "error",
+        heading: "Porcodillo!",
         message: `${error}`,
       });
     }
@@ -100,37 +104,52 @@ function TopUpManager(props: {}) {
 
     // This should be contained in the refund response...
     try {
-      console.log(cauldronCards);
-      let mimAddresses = _.uniq(_.map(cauldronCards, (card, address) => card.cauldronInfo?.mimAddress || ''));
-      let degenboxAddresses = _.uniq(_.map(cauldronCards, (card, address) => card.cauldronInfo?.degenboxAddress || ''));
+      let mimAddresses = _.uniq(
+        _.map(
+          cauldronCards,
+          (card, address) => card.cauldronInfo?.mimAddress || "",
+        ),
+      );
+      let degenboxAddresses = _.uniq(
+        _.map(
+          cauldronCards,
+          (card, address) => card.cauldronInfo?.degenboxAddress || "",
+        ),
+      );
 
-      if (degenboxAddresses.length > 1) throw 'Multiple degenboxAddresses found' + JSON.stringify(degenboxAddresses);
-      if (mimAddresses.length > 1) throw 'Multiple mimAddresses found' + JSON.stringify(mimAddresses);
+      if (degenboxAddresses.length > 1)
+        throw (
+          "Multiple degenboxAddresses found" + JSON.stringify(degenboxAddresses)
+        );
+      if (mimAddresses.length > 1)
+        throw "Multiple mimAddresses found" + JSON.stringify(mimAddresses);
 
-      let totalMimAmountBn = _.reduce(cauldronCards, (acc, card, _) => acc.add(card.mimAmount), bn(0));
-      console.log(`TOTAL: ${totalMimAmountBn.toString()}`);
+      let totalMimAmountBn = _.reduce(
+        cauldronCards,
+        (acc, card, _) => acc.add(card.mimAmount),
+        bn(0),
+      );
 
       txs.push(
         getMimApproveTx({
           amount: totalMimAmountBn.mul(expandDecimals(18)),
-          mimAddress: _.first(mimAddresses) || '',
-          degenboxAddress: _.first(degenboxAddresses) || '',
-        })
+          mimAddress: _.first(mimAddresses) || "",
+          degenboxAddress: _.first(degenboxAddresses) || "",
+        }),
       );
 
       _.map(cauldronCards, (card, address) =>
         txs.push(
           getMimTopupTx({
-            cauldronAddress: card.cauldronInfo?.cauldron || '',
+            cauldronAddress: card.cauldronInfo?.cauldron || "",
             safeAddress: safe.safeAddress,
             amount: bn(card.mimAmount).mul(expandDecimals(18)),
-            mimAddress: card.cauldronInfo?.mimAddress || '',
-            degenboxAddress: card.cauldronInfo?.degenboxAddress || '',
-          })
-        )
+            mimAddress: card.cauldronInfo?.mimAddress || "",
+            degenboxAddress: card.cauldronInfo?.degenboxAddress || "",
+          }),
+        ),
       );
 
-      console.log('HERE');
       const { safeTxHash } = await sdk.txs.send({ txs });
     } catch (e) {
       console.error(e);
@@ -139,31 +158,37 @@ function TopUpManager(props: {}) {
 
   return (
     <div>
-      <div className="mt-5 flex flex-row gap-24">
-        <div className="flex flex-col w-1/4 gap-6">
+      <div className="mt-5 flex flex-col gap-12 lg:flex-row">
+        <div className="flex w-full flex-col gap-6 lg:w-1/4">
           <div>
-            <div className="mt-2 relative">
-              <label htmlFor="cauldron" className="block text-xs font-medium text-zinc-600">
+            <div className="relative mt-2">
+              <label
+                htmlFor="cauldron"
+                className="block text-xs font-medium text-zinc-600"
+              >
                 Cauldron Address
               </label>
               <input
                 type="text"
                 name="cauldron"
                 id="cauldron"
-                className="peer block w-full bg-transparent py-1.5 text-gray-200 pl-3 focus:outline-none sm:text-sm sm:leading-6"
+                className="peer block w-full bg-transparent py-1.5 pl-3 text-gray-200 focus:outline-none sm:text-sm sm:leading-6"
                 placeholder="0x..."
                 onChange={(event) => setInputCauldronAddr(event.target.value)}
                 value={inputCauldronAddr}
               />
               <div
-                className="absolute inset-x-0 bottom-0 border-t border-gray-400 peer-focus:border-t-1 peer-focus:border-blue-500"
+                className="peer-focus:border-t-1 absolute inset-x-0 bottom-0 border-t border-gray-400 peer-focus:border-blue-500"
                 aria-hidden="true"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="amount" className="block text-xs font-medium text-zinc-600">
+            <label
+              htmlFor="amount"
+              className="block text-xs font-medium text-zinc-600"
+            >
               Top-up Amount
             </label>
             <div className="relative rounded-md shadow-sm">
@@ -174,7 +199,7 @@ function TopUpManager(props: {}) {
                 type="text"
                 name="price"
                 id="price"
-                className="peer block w-full bg-transparent py-1.5 text-gray-200 pr-14 text-right focus:outline-none sm:text-sm sm:leading-6"
+                className="peer block w-full bg-transparent py-1.5 pr-14 text-right text-gray-200 focus:outline-none sm:text-sm sm:leading-6"
                 placeholder="0.00"
                 onChange={(e) => setInputMimAmount(e.target.value)}
                 value={inputMimAmount}
@@ -186,7 +211,7 @@ function TopUpManager(props: {}) {
                 </span>
               </div>
               <div
-                className="absolute inset-x-0 bottom-0 border-t border-gray-400 peer-focus:border-t-1 peer-focus:border-blue-500"
+                className="peer-focus:border-t-1 absolute inset-x-0 bottom-0 border-t border-gray-400 peer-focus:border-blue-500"
                 aria-hidden="true"
               />
             </div>
@@ -198,7 +223,7 @@ function TopUpManager(props: {}) {
               onClick={() => addTransaction(inputCauldronAddr, inputMimAmount)}
             >
               <span>
-                <PlusIcon className="h-5 w-5 inline mr-2" />
+                <PlusIcon className="mr-2 inline h-5 w-5" />
               </span>
               Add Cauldron
             </button>
@@ -210,9 +235,10 @@ function TopUpManager(props: {}) {
             </button>
           </div>
         </div>
-        <div className="w-3/4 flex flex-wrap gap-4">
-          {Object.values(cauldronCards).map((card) => (
+        <div className="flex flex-wrap gap-4 lg:w-3/4">
+          {_.map(cauldronCards, (card, key) => (
             <CauldronInfoCard
+              cauldronAddress={key}
               info={card.cauldronInfo}
               mimAmount={card.mimAmount}
               isSubmitting={false}
