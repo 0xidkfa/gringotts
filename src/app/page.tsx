@@ -12,7 +12,7 @@ import _ from 'underscore';
 import { Card } from '@/components/Card';
 import { CauldronInfoCard } from '@/components/CauldronInfoCard';
 import { getDegenBoxMimBalance } from '@/models/DistributionCalculator';
-import QuickNode from '@quicknode/sdk';
+import { PlusIcon } from '@heroicons/react/24/outline';
 
 export default function Home() {
   return (
@@ -38,51 +38,61 @@ interface CauldronInfo {
   userMaxBorrow: BigNumber;
 }
 
+interface TxInfo {
+  mimAmount: string;
+  cauldronInfo: CauldronInfo | undefined;
+  isSubmitting: boolean;
+}
+
 function TopUpManager(props: {}) {
   const { showFlashMessage } = useFlashMessage();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cauldronAddress, setCauldronAddress] = useState('');
-  const [cauldronInfo, setCauldronInfo] = useState<CauldronInfo | undefined>(undefined);
-  const [mimAmount, setMimAmount] = useState('0');
-
+  const [inputCauldronAddr, setInputCauldronAddr] = useState('');
+  const [inputMimAmount, setInputMimAmount] = useState('0');
+  const [cauldronCards, setCauldronCards] = useState<{ [key: string]: TxInfo }>({});
   const { sdk, safe } = useSafeAppsSDK();
 
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+  async function fetchCauldronInfo(cauldronAddress: string) {
+    let response: CauldronInfo;
 
-    const fetchData = async () => {
-      try {
-        setIsSubmitting(true);
-        let chain = await sdk.safe.getChainInfo();
-        let response = await postData('/api/cauldronInfo', { cauldronAddress, chain });
-        console.log(response);
-        setCauldronInfo(response);
-      } catch (error) {
-        showFlashMessage({
-          type: 'error',
-          heading: 'Porcodillo!',
-          message: `${error}`,
-        });
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
+    try {
+      setCauldronCards((prevCards) => ({
+        ...prevCards,
+        [cauldronAddress]: {
+          mimAmount: inputMimAmount,
+          isSubmitting: true,
+          cauldronInfo: undefined,
+        },
+      }));
 
-    // Set a timeout to wait for 3 seconds
-    if (cauldronAddress !== '') {
-      timeoutId = setTimeout(() => {
-        fetchData(); // Call the async function
-      }, 1000);
+      let chain = await sdk.safe.getChainInfo();
+      response = await postData('/api/cauldronInfo', { cauldronAddress, chain });
+      console.log(response);
+
+      return response;
+    } catch (error) {
+      showFlashMessage({
+        type: 'error',
+        heading: 'Porcodillo!',
+        message: `${error}`,
+      });
     }
+  }
 
-    // Cleanup function to clear the timeout when the component unmounts or cauldronAddress changes
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [cauldronAddress]);
+  async function addTransaction(cauldronAddress: string, mimAmount: string) {
+    let info = await fetchCauldronInfo(cauldronAddress);
+
+    setCauldronCards((prevCards) => ({
+      ...prevCards,
+      [cauldronAddress]: {
+        mimAmount: mimAmount,
+        cauldronInfo: info,
+        isSubmitting: false,
+      },
+    }));
+  }
 
   async function getSubmitHandler() {
-    if (cauldronInfo === undefined) {
+    if (_.keys(cauldronCards).length == 0) {
       return;
     }
 
@@ -90,26 +100,38 @@ function TopUpManager(props: {}) {
 
     // This should be contained in the refund response...
     try {
-      let mimAmountBn = bn(mimAmount).mul(expandDecimals(18));
+      console.log(cauldronCards);
+      let mimAddresses = _.uniq(_.map(cauldronCards, (card, address) => card.cauldronInfo?.mimAddress || ''));
+      let degenboxAddresses = _.uniq(_.map(cauldronCards, (card, address) => card.cauldronInfo?.degenboxAddress || ''));
+
+      if (degenboxAddresses.length > 1) throw 'Multiple degenboxAddresses found' + JSON.stringify(degenboxAddresses);
+      if (mimAddresses.length > 1) throw 'Multiple mimAddresses found' + JSON.stringify(mimAddresses);
+
+      let totalMimAmountBn = _.reduce(cauldronCards, (acc, card, _) => acc.add(card.mimAmount), bn(0));
+      console.log(`TOTAL: ${totalMimAmountBn.toString()}`);
+
       txs.push(
         getMimApproveTx({
-          amount: mimAmountBn,
-          mimAddress: cauldronInfo.mimAddress,
-          degenboxAddress: cauldronInfo.degenboxAddress,
-        })
-      );
-      txs.push(
-        getMimTopupTx({
-          cauldronAddress,
-          safeAddress: safe.safeAddress,
-          amount: mimAmountBn,
-          mimAddress: cauldronInfo.mimAddress || '',
-          degenboxAddress: cauldronInfo.degenboxAddress || '',
+          amount: totalMimAmountBn.mul(expandDecimals(18)),
+          mimAddress: _.first(mimAddresses) || '',
+          degenboxAddress: _.first(degenboxAddresses) || '',
         })
       );
 
+      _.map(cauldronCards, (card, address) =>
+        txs.push(
+          getMimTopupTx({
+            cauldronAddress: card.cauldronInfo?.cauldron || '',
+            safeAddress: safe.safeAddress,
+            amount: bn(card.mimAmount).mul(expandDecimals(18)),
+            mimAddress: card.cauldronInfo?.mimAddress || '',
+            degenboxAddress: card.cauldronInfo?.degenboxAddress || '',
+          })
+        )
+      );
+
+      console.log('HERE');
       const { safeTxHash } = await sdk.txs.send({ txs });
-      const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash);
     } catch (e) {
       console.error(e);
     }
@@ -118,7 +140,7 @@ function TopUpManager(props: {}) {
   return (
     <div>
       <div className="mt-5 flex flex-row gap-24">
-        <div className="flex flex-col w-1/3 gap-6">
+        <div className="flex flex-col w-1/4 gap-6">
           <div>
             <div className="mt-2 relative">
               <label htmlFor="cauldron" className="block text-xs font-medium text-zinc-600">
@@ -130,8 +152,8 @@ function TopUpManager(props: {}) {
                 id="cauldron"
                 className="peer block w-full bg-transparent py-1.5 text-gray-200 pl-3 focus:outline-none sm:text-sm sm:leading-6"
                 placeholder="0x..."
-                onChange={(event) => setCauldronAddress(event.target.value)}
-                value={cauldronAddress}
+                onChange={(event) => setInputCauldronAddr(event.target.value)}
+                value={inputCauldronAddr}
               />
               <div
                 className="absolute inset-x-0 bottom-0 border-t border-gray-400 peer-focus:border-t-1 peer-focus:border-blue-500"
@@ -154,8 +176,8 @@ function TopUpManager(props: {}) {
                 id="price"
                 className="peer block w-full bg-transparent py-1.5 text-gray-200 pr-14 text-right focus:outline-none sm:text-sm sm:leading-6"
                 placeholder="0.00"
-                onChange={(e) => setMimAmount(e.target.value)}
-                value={mimAmount}
+                onChange={(e) => setInputMimAmount(e.target.value)}
+                value={inputMimAmount}
                 aria-describedby="price-currency"
               />
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -170,17 +192,32 @@ function TopUpManager(props: {}) {
             </div>
           </div>
 
-          <div>
+          <div className="flex flex-row gap-x-5">
+            <button
+              className="rounded bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              onClick={() => addTransaction(inputCauldronAddr, inputMimAmount)}
+            >
+              <span>
+                <PlusIcon className="h-5 w-5 inline mr-2" />
+              </span>
+              Add Cauldron
+            </button>
             <button
               className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               onClick={getSubmitHandler}
             >
-              Submit
+              Generate Gnosis Tx
             </button>
           </div>
         </div>
-        <div className="w-2/3 flex flex-col">
-          <CauldronInfoCard info={cauldronInfo} mimAmount={mimAmount} isSubmitting={isSubmitting}></CauldronInfoCard>
+        <div className="w-3/4 flex flex-wrap gap-4">
+          {Object.values(cauldronCards).map((card) => (
+            <CauldronInfoCard
+              info={card.cauldronInfo}
+              mimAmount={card.mimAmount}
+              isSubmitting={false}
+            ></CauldronInfoCard>
+          ))}
         </div>
       </div>
     </div>

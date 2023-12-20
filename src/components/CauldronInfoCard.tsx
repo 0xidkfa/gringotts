@@ -1,5 +1,6 @@
-import { bn, bnToFloat, formatNumber, expandDecimals } from '@/helpers/utils';
+import { bn, bnToFloat, formatNumber, expandDecimals, formatAddress } from '@/helpers/utils';
 import Spinner from './Spinner';
+import { ClipboardIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 
 export function CauldronInfoCard({
   info,
@@ -20,8 +21,8 @@ export function CauldronInfoCard({
 
   return (
     <>
-      {isSubmitting && (
-        <div className="dashboard-card rounded-lg p-6 shadow-lg dark:bg-zinc-900 border dark:border-zinc-700/40 w-[500px]">
+      {!info?.cauldron && (
+        <div className="dashboard-card rounded-lg p-6 shadow-lg dark:bg-zinc-900 border dark:border-zinc-700/40 w-[450px]">
           <div className="flex flex-col items-center">
             <div className="text-blue-600 w-12 h-12">
               <Spinner></Spinner>
@@ -30,13 +31,14 @@ export function CauldronInfoCard({
           </div>
         </div>
       )}
-      {info?.cauldron && !isSubmitting && (
-        <div className="dashboard-card rounded-lg p-6 shadow-lg dark:bg-zinc-900 border dark:border-zinc-700/40 w-[500px]">
-          <div className="flex flex-col gap-x-4 gap-y-6">
+      {info?.cauldron && (
+        <div className="dashboard-card rounded-lg p-6 shadow-lg dark:bg-zinc-900 border dark:border-zinc-700/40 w-[450px]">
+          <div className="flex flex-col gap-x-4 gap-y-4">
             <div className="flex flex-col">
               <div className="text-sm font-medium text-gray-600">Cauldron</div>
-              <div className="text-black dark:text-zinc-100 font-semibold">
-                {info.collateral} {info.cauldron}
+              <div className="text-black dark:text-zinc-100 font-semibold flex flex-col">
+                <span>{info.collateral}</span>
+                <span className="font-light text-xs dark:text-zinc-200 flex flex-row pt-1">{info.cauldron}</span>
               </div>
             </div>
             <div className="flex flex-row w-full">
